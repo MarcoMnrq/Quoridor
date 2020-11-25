@@ -25,7 +25,6 @@ myfont = pygame.font.SysFont('Comic Sans MS', 30)
 textsurface = myfont.render('Modo edicion activado', False, (255, 0, 0))
 
 
-# Bot Class
 def cost(u, v):
     if Graph.get_edge_data(u, v).get('weight') != 1:
         pygame.quit()
@@ -55,7 +54,7 @@ def dijkstra(start, end):
     pq = PriorityQueue()
     visited = set()
     previous = {}
-    
+
     distances = {v: inf for v in list(nx.nodes(Graph))}
     distances[start] = 0
     pq.put((distances[start], start))
@@ -85,7 +84,7 @@ def a_star(start, final):
     pq = PriorityQueue()
     pq.put((0, count, start))
     previous = {}
-    
+
     g[start] = 0
     f[start] = cost(start, final)
     open_set_hash = {start}
@@ -108,6 +107,7 @@ def a_star(start, final):
     return reconstruct_path(previous, start, final)
 
 
+# Bot Class
 class Bot:
     def __init__(self, node, x, y, barriers, name):
         self.node = node
