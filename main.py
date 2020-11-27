@@ -23,6 +23,7 @@ screen = pygame.display.set_mode((RES, RES))
 pygame.display.set_caption("Quoridor")
 myfont = pygame.font.SysFont('Comic Sans MS', 30)
 textsurface = myfont.render('Modo edicion activado', False, (255, 0, 0))
+cameFrom = {}
 
 
 def cost(u, v):
@@ -49,21 +50,48 @@ def manhattan(p1, p2):
     return abs(x1 - x2) + abs(y1 - y2)
 
 
+def Bellman_Ford(G, start, end):
+    return nx.bellman_ford_path(G, start, end)
+    distancias = dict()
+    anterior = dict()
+    for V in list(G):
+        distancias[V] = float('Inf')
+        anterior[V] = None
+    distancias[start] = 0
+    for V in list(G):
+        for u, v in G.edges():
+            distancia = distancias[u] + 1
+            if distancia < distancias[v]:
+                distancias[v] = distancia
+                anterior[v] = u
+    antes = anterior[end]
+    path = [end]
+    while antes != start and antes is not None:
+        path.insert(0, antes)
+        antes = anterior[antes]
+    if antes == start:
+        path.insert(0, start)
+        return path
+    return []
+
+
 def dijkstra(start, end):
     # Variable Declaration
     pq = PriorityQueue()
     visited = set()
     previous = {}
 
-    distances = {v: inf for v in list(nx.nodes(Graph))}
+    distances = {v: inf for v in list(nx.nodes(Graph))}  # lista de nodods
     distances[start] = 0
-    pq.put((distances[start], start))
+    pq.put((distances[start], start))  # nodo inicial
+
     # While the priority queue has data
     while not pq.empty():
         distance, current = pq.get()
         visited.add(current)
-        for neighbor in dict(Graph.adjacency()).get(current):
-            route = distances[current] + cost(current, neighbor)
+        for neighbor in dict(Graph.adjacency()).get(current):  # permite crear lista de adyacencia .get(current)
+            route = distances[current] + cost(current,
+                                              neighbor)  # agrega el valo de la distancia el current (1) lo guarda en el route
             if route < distances[neighbor]:
                 distances[neighbor] = route
                 previous[neighbor] = current
@@ -121,7 +149,8 @@ class Bot:
 
     def make_move(self):
         # route = dijkstra(self.node, 81)
-        route = nx.astar_path(Graph, self.node, 81)
+        # route = nx.astar_path(Graph, self.node, 81)
+        route = Bellman_Ford(Graph, self.node, 81)
         print(route)
         """""
         print(nx.shortest_path(Graph, self.node, 81))
